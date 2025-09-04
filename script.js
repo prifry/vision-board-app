@@ -2,7 +2,7 @@ let selectedCard = null;
 const board = document.getElementById("board");
 
 // 1. Create 12 empty cards
-for (let i = 0; i < 12; i++) {
+for (let i = 0; i < 6; i++) {
     const card = document.createElement("div");
     card.classList.add("card");
     card.dataset.index = i;
