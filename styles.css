@@ -1,5 +1,6 @@
-body{
- font-family: 'Poppins', sans-serif;
+/* General layout */
+body {
+  font-family: 'Poppins', sans-serif;
   margin: 0;
   background: linear-gradient(to right, #a29bfe, #81ecec);
   text-align: center;
@@ -9,6 +10,7 @@ body{
 header {
   padding: 20px;
 }
+
 h1 {
   font-size: 36px;
   color: #333;
@@ -20,6 +22,7 @@ h1 {
   margin-bottom: 30px;
 }
 
+/* Vision board grid */
 .board {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -29,67 +32,13 @@ h1 {
   padding: 20px;
 }
 
-
-.card p {
-  padding: 10px;
-  font-size: 14px;
-  color: #444;
-}
-
-.toolbar {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  cursor: pointer;
-  color: white;
-}
-
-#uploadImages {
-  background-color: #08bdbd;
-}
-
-#addQuotes {
-  background-color: #9b94fc;
-}
-
-#saveBoards {
-  background-color: #eca595;
-}
-
-#resetBoards {
-  background-color: #e43e19;
-}
-
-
-.quote-text {
-  font-size: 14px;
-  color: #753838;
-  padding: 10px;
-  background-color: #ffffffcc;
-  position: relative;
-  z-index: 2;
-}
-
-.card.selected {
-  outline: 2px solid #81ecec;
-}
-
+/* Card styling */
 .card {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
   align-items: center;
   padding: 10px;
-  background-color: rgba(255, 255, 255, 0.9); /* translucent white */
+  background-color: rgba(255, 255, 255, 0.9);
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
   min-height: 200px;
@@ -106,12 +55,80 @@ button {
   margin-bottom: 10px;
 }
 
+/* Quote inside card */
 .quote-text {
   font-size: 14px;
   color: #444;
-  margin-top: auto;
+  margin-top: 8px;
+  padding: 4px;
+  border: 1px dashed transparent;
+  outline: none;
+  cursor: text;
+  background-color: #ffffffcc;
+  border-radius: 4px;
+  transition: background 0.2s ease;
 }
 
+.quote-text:focus {
+  border: 1px dashed #666;
+  background: #f9f9f9;
+}
+
+/* Card button area */
+.card-buttons {
+  margin-top: 8px;
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+
+.card-buttons button {
+  padding: 6px 12px;
+  font-size: 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  color: white;
+  background-color: #e17055;
+  transition: background 0.2s ease;
+}
+
+.card-buttons button:hover {
+  background-color: #d63031;
+}
+
+/* Toolbar */
+.toolbar {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  color: white;
+  transition: background 0.2s ease;
+}
+
+#uploadImages {
+  background-color: #08bdbd;
+}
+
+#saveBoards {
+  background-color: #eca595;
+}
+
+#resetBoards {
+  background-color: #e43e19;
+}
+
+/* Toast notification */
 .toast {
   position: fixed;
   bottom: 30px;
