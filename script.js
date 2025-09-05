@@ -1,146 +1,124 @@
-let selectedCard = null;
 const board = document.getElementById("board");
+const uploadInput = document.getElementById("uploadImage");
 
-// 1. Create 12 empty cards
-for (let i = 0; i < 6; i++) {
-    const card = document.createElement("div");
-    card.classList.add("card");
-    card.dataset.index = i;
-   // card.innerHTML = `<p></p>`;
-    card.addEventListener("click", function () {
-        // Highlight selected card
-        document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
-        card.classList.add("selected");
-        selectedCard = card;
-    });
-    board.appendChild(card);
-}
-
-// 2. Upload image
+// 1. Upload image → create card
 function triggerUpload() {
-    document.getElementById("uploadImage").click();
+  uploadInput.click();
 }
 
-document.getElementById("uploadImage").addEventListener("change", function (e) {
-    const file = e.target.files[0];
-    if (file && file.type.startsWith("image/")) {
-        if (!selectedCard) {
-            alert("Click a card first to select where to upload or replace the image.");
-            return;
-        }
-
-        const reader = new FileReader();
-        reader.onload = function (event) {
-            let img = selectedCard.querySelector("img");
-
-            if (img) {
-                // If image exists, just update the source
-                img.src = event.target.result;
-            } else {
-                // If no image, create it and insert at top
-                img = document.createElement("img");
-                img.src = event.target.result;
-                img.alt = "Vision";
-                selectedCard.insertBefore(img, selectedCard.firstChild);
-            }
-        };
-
-        reader.readAsDataURL(file);
-        
-    }
-    img.src = event.target.result;
-        showToast("Image updated!");
+uploadInput.addEventListener("change", function (e) {
+  const file = e.target.files[0];
+  if (file && file.type.startsWith("image/")) {
+    const reader = new FileReader();
+    reader.onload = function (event) {
+      createCard(event.target.result);
+      showToast("New card added!");
+    };
+    reader.readAsDataURL(file);
+  }
 });
 
-// 3. Add or update quote
-function addQuote() {
-    if (!selectedCard) {
-        alert("Click a card first to select where to add or update the quote.");
-        return;
+// 2. Create a card with image + quote + buttons
+function createCard(imageSrc) {
+  const card = document.createElement("div");
+  card.classList.add("card");
+
+  const img = document.createElement("img");
+  img.src = imageSrc;
+  img.alt = "Vision";
+
+  const quoteEl = document.createElement("p");
+  quoteEl.className = "quote-text";
+  quoteEl.textContent = "Click here to add a quote";
+  quoteEl.contentEditable = "true"; // make editable
+  quoteEl.addEventListener("focus", () => {
+    if (quoteEl.textContent === "Click here to add a quote") {
+      quoteEl.textContent = "";
     }
-
-    const quote = prompt("Enter your quote:");
-
-    if (quote) {
-        // Check if quote already exists in the card
-        let quoteEl = selectedCard.querySelector(".quote-text");
-
-        if (quoteEl) {
-            // If it exists, update the content
-            quoteEl.textContent = quote;
-        } else {
-            // If not, create and append the quote
-            quoteEl = document.createElement("p");
-            quoteEl.className = "quote-text";
-            quoteEl.textContent = quote;
-            selectedCard.appendChild(quoteEl);
-        }
+  });
+  quoteEl.addEventListener("blur", () => {
+    if (!quoteEl.textContent.trim()) {
+      quoteEl.textContent = "Click here to add a quote";
     }
     showToast("Quote updated!");
-}
-// 4. Find first empty card
-function getSelectedCard() {
-    const cards = document.querySelectorAll(".card");
-    for (let card of cards) {
-        const isEmpty = card.textContent.trim() === "";
-        if (isEmpty || card.querySelector("img") || card.querySelector(".quote-text")) {
-            if (!card.classList.contains("filled")) {
-                card.classList.add("filled");
-                return card;
-            }
-        }
-    }
-    return null;
+  });
+
+  // Buttons for this card only
+  const buttonBar = document.createElement("div");
+  buttonBar.classList.add("card-buttons");
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.textContent = "Delete";
+  deleteBtn.onclick = () => {
+    card.remove();
+    showToast("Card removed!");
+  };
+
+  buttonBar.appendChild(deleteBtn);
+
+  card.appendChild(img);
+  card.appendChild(quoteEl);
+  card.appendChild(buttonBar);
+
+  board.appendChild(card);
 }
 
-// 5. Save board to localStorage
+// 3. Save board to localStorage
 function saveBoard() {
-    const data = Array.from(document.querySelectorAll(".card")).map(card => card.innerHTML);
-    localStorage.setItem("visionBoard", JSON.stringify(data));
-    alert("Board saved!");
+  const data = Array.from(document.querySelectorAll(".card")).map(card => card.innerHTML);
+  localStorage.setItem("visionBoard", JSON.stringify(data));
+  alert("Board saved!");
 }
 
-// 6. Load saved board
+// 4. Load saved board
 window.addEventListener("DOMContentLoaded", () => {
-    const data = JSON.parse(localStorage.getItem("visionBoard"));
-    if (data) {
-        const cards = document.querySelectorAll(".card");
-        data.forEach((content, i) => {
-            if (cards[i]) cards[i].innerHTML = content;
+  const data = JSON.parse(localStorage.getItem("visionBoard"));
+  if (data) {
+    data.forEach(content => {
+      const card = document.createElement("div");
+      card.classList.add("card");
+      card.innerHTML = content;
+
+      // restore editable quotes
+      const quoteEl = card.querySelector(".quote-text");
+      if (quoteEl) {
+        quoteEl.contentEditable = "true";
+        quoteEl.addEventListener("blur", () => {
+          if (!quoteEl.textContent.trim()) {
+            quoteEl.textContent = "Click here to add a quote";
+          }
+          showToast("Quote updated!");
         });
-    }
+      }
 
-    window.addEventListener("DOMContentLoaded", () => {
-        const data = JSON.parse(localStorage.getItem("visionBoard"));
-        if (data) {
-            const cards = document.querySelectorAll(".card");
-            data.forEach((content, i) => {
-                if (cards[i]) cards[i].innerHTML = content;
-            });
-        }
+      // restore delete button event
+      const deleteBtn = card.querySelector("button");
+      if (deleteBtn) {
+        deleteBtn.onclick = () => {
+          card.remove();
+          showToast("Card removed!");
+        };
+      }
 
-        // Show welcome toast
-        showToast("You can change your images and quotes anytime—just click a card.");
+      board.appendChild(card);
     });
-
-    
-   
-
+  }
+  showToast("You can change your images and quotes anytime—just click a card.");
 });
- function showToast(message, duration = 3000) {
-        const toast = document.getElementById("toast");
-        toast.textContent = message;
-        toast.classList.add("show");
 
-        setTimeout(() => {
-            toast.classList.remove("show");
-        }, duration);
-    }
+// 5. Reset board
+function resetBoard() {
+  if (confirm("Has your vision come true? Start a new board?")) {
+    localStorage.removeItem("visionBoard");
+    board.innerHTML = "";
+    showToast("Board reset!");
+  }
+}
 
-    // 7. Reset the board
-    function resetBoard() {
-        if (confirm("Has your vision come true? Start a new board?")) {
-            localStorage.removeItem("visionBoard");
-            window.location.reload();
-        }
-    }
+// 6. Toast function
+function showToast(message, duration = 3000) {
+  const toast = document.getElementById("toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), duration);
+}
